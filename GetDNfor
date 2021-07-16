@@ -1,0 +1,51 @@
+mkdir $1/
+
+tblastn -db assembly/genome1-full_pseudohap.fasta -query query_sequence/$1.fa -out blastoutput.txt -outfmt 6
+awk '$9<$10 {print $2":"$9"-"$10} $9>$10 {print $2":"$10"-"$9}' blastoutput.txt > test.txt
+while read -r n ; do samtools faidx assembly/genome1-full_pseudohap.fasta $n >> Genome1_$1.fa ; done < test.txt
+mkdir $1/Genome_1/
+mv blastoutput.txt $1/Genome_1/
+mv test.txt $1/Genome_1/
+mv Genome1_$1.fa $1/Genome_1/
+
+tblastn -db assembly/genome3-800M_pseudohap.fasta -query query_sequence/$1.fa -out blastoutput.txt -outfmt 6
+awk '$9<$10 {print $2":"$9"-"$10} $9>$10 {print $2":"$10"-"$9}' blastoutput.txt > test.txt
+while read -r n ; do samtools faidx assembly/genome3-800M_pseudohap.fasta $n >> Genome3_$1.fa ; done < test.txt
+mkdir $1/Genome_3/
+mv blastoutput.txt $1/Genome_3/
+mv test.txt $1/Genome_3/
+mv Genome3_$1.fa $1/Genome_3/
+
+tblastn -db assembly/genome5-full-take2_pseudohap.fasta -query query_sequence/$1.fa -out blastoutput.txt -outfmt 6
+awk '$9<$10 {print $2":"$9"-"$10} $9>$10 {print $2":"$10"-"$9}' blastoutput.txt > test.txt
+while read -r n ; do samtools faidx assembly/genome5-full-take2_pseudohap.fasta $n >> Genome5_$1.fa ; done < test.txt
+mkdir $1/Genome_5/
+mv blastoutput.txt $1/Genome_5/
+mv test.txt $1/Genome_5/
+mv Genome5_$1.fa $1/Genome_5/
+
+tblastn -db assembly/genome7-800M_pseudohap.fasta -query query_sequence/$1.fa -out blastoutput.txt -outfmt 6
+awk '$9<$10 {print $2":"$9"-"$10} $9>$10 {print $2":"$10"-"$9}' blastoutput.txt > test.txt
+while read -r n ; do samtools faidx assembly/genome7-800M_pseudohap.fasta $n >> Genome7_$1.fa ; done < test.txt
+mkdir $1/Genome_7/
+mv blastoutput.txt $1/Genome_7/
+mv test.txt $1/Genome_7/
+mv Genome7_$1.fa $1/Genome_7/
+
+tblastn -db assembly/genome11-full2_pseudohap.fasta -query query_sequence/$1.fa -out blastoutput.txt -outfmt 6
+awk '$9<$10 {print $2":"$9"-"$10} $9>$10 {print $2":"$10"-"$9}' blastoutput.txt > test.txt
+while read -r n ; do samtools faidx assembly/genome11-full2_pseudohap.fasta $n >> Genome11_$1.fa ; done < test.txt
+mkdir $1/Genome_11/
+mv blastoutput.txt $1/Genome_11/
+mv test.txt $1/Genome_11/
+mv Genome11_$1.fa $1/Genome_11/
+
+tblastn -db assembly/genome15-full_pseudohap.fasta -query query_sequence/$1.fa -out blastoutput.txt -outfmt 6
+awk '$9<$10 {print $2":"$9"-"$10} $9>$10 {print $2":"$10"-"$9}' blastoutput.txt > test.txt
+while read -r n ; do samtools faidx assembly/genome15-full_pseudohap.fasta $n >> Genome15_$1.fa ; done < test.txt
+mkdir $1/Genome_15/
+mv blastoutput.txt $1/Genome_15/
+mv test.txt $1/Genome_15/
+mv Genome15_$1.fa $1/Genome_15/
+
+mv $1/ genes/

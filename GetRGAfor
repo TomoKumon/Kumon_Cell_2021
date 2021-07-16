@@ -1,0 +1,139 @@
+echo "working on ""$1"
+
+grep -iw "$1" mm10.gtf | egrep '\texon\t' > $1_cutme.gtf
+awk '!a[$0]++' $1_cutme.gtf > $1.gtf
+rm $1_cutme.gtf
+bedtools getfasta -fi mm10.fa -bed $1.gtf -fo $1_deleteme.fa
+sed '/^>/s/:/-/' $1_deleteme.fa | awk -F "-" -v OFS="-" 'NR%2==1{$2+=1}1' | sed '/^>/s/-/:/' > $1_onebased.fa
+awk '!a[$0]++' $1_onebased.fa > $1.fa
+samtools faidx $1.fa
+sed '/>/d' $1.fa > $1_CDS.fa
+rm $1_deleteme.fa
+rm $1_onebased.fa
+mkdir genes/$1
+
+bcftools consensus -f $1.fa -o $1_Genome1.fa Genome1_phased_variants.vcf.gz
+bcftools consensus -f $1.fa -o $1_Genome3.fa Genome3_phased_variants.vcf.gz
+bcftools consensus -f $1.fa -o $1_Genome5.fa Genome5_phased_variants.vcf.gz
+bcftools consensus -f $1.fa -o $1_Genome7.fa Genome7_phased_variants.vcf.gz
+bcftools consensus -f $1.fa -o $1_Genome11.fa Genome11_phased_variants.vcf.gz
+bcftools consensus -f $1.fa -o $1_Genome15.fa Genome15_phased_variants.vcf.gz
+
+sed '/>/d' $1_Genome1.fa > $1_CDS_Genome1.fa
+sed '/>/d' $1_Genome3.fa > $1_CDS_Genome3.fa
+sed '/>/d' $1_Genome5.fa > $1_CDS_Genome5.fa
+sed '/>/d' $1_Genome7.fa > $1_CDS_Genome7.fa
+sed '/>/d' $1_Genome11.fa > $1_CDS_Genome11.fa
+sed '/>/d' $1_Genome15.fa > $1_CDS_Genome15.fa
+
+mv $1_Genome1.fa genes/$1/
+mv $1_Genome3.fa genes/$1/
+mv $1_Genome5.fa genes/$1/
+mv $1_Genome7.fa genes/$1/
+mv $1_Genome11.fa genes/$1/
+mv $1_Genome15.fa genes/$1/
+
+mv $1.gtf genes/$1/
+mv $1.fa genes/$1/
+mv $1.fa.fai genes/$1/
+
+mv $1_CDS.fa genes/
+mv $1_CDS_Genome1.fa genes/
+mv $1_CDS_Genome3.fa genes/
+mv $1_CDS_Genome5.fa genes/
+mv $1_CDS_Genome7.fa genes/
+mv $1_CDS_Genome11.fa genes/
+mv $1_CDS_Genome15.fa genes/
+
+getorf -sequence genes/$1_CDS.fa -minsize 100 -find 3 -outseq genes/$1_deleteme.fa
+getorf -sequence genes/$1_CDS_Genome1.fa -minsize 100 -find 3 -outseq genes/$1_Genome1_deleteme.fa
+getorf -sequence genes/$1_CDS_Genome3.fa -minsize 100 -find 3 -outseq genes/$1_Genome3_deleteme.fa
+getorf -sequence genes/$1_CDS_Genome5.fa -minsize 100 -find 3 -outseq genes/$1_Genome5_deleteme.fa
+getorf -sequence genes/$1_CDS_Genome7.fa -minsize 100 -find 3 -outseq genes/$1_Genome7_deleteme.fa
+getorf -sequence genes/$1_CDS_Genome11.fa -minsize 100 -find 3 -outseq genes/$1_Genome11_deleteme.fa
+getorf -sequence genes/$1_CDS_Genome15.fa -minsize 100 -find 3 -outseq genes/$1_Genome15_deleteme.fa
+
+sizeseq -sequences genes/$1_deleteme.fa -descending Y -outseq genes/$1_killme.fa
+sizeseq -sequences genes/$1_Genome1_deleteme.fa -descending Y -outseq genes/$1_Genome1_killme.fa
+sizeseq -sequences genes/$1_Genome3_deleteme.fa -descending Y -outseq genes/$1_Genome3_killme.fa
+sizeseq -sequences genes/$1_Genome5_deleteme.fa -descending Y -outseq genes/$1_Genome5_killme.fa
+sizeseq -sequences genes/$1_Genome7_deleteme.fa -descending Y -outseq genes/$1_Genome7_killme.fa
+sizeseq -sequences genes/$1_Genome11_deleteme.fa -descending Y -outseq genes/$1_Genome11_killme.fa
+sizeseq -sequences genes/$1_Genome15_deleteme.fa -descending Y -outseq genes/$1_Genome15_killme.fa
+
+awk -v RS='>' 'NR>1 {gsub("\n", ";", $0); sub(";$", "", $0); print ">"$0}' genes/$1_killme.fa | head -n 1 | tr ';' '\n' > genes/$1_changeme.fa
+awk -v RS='>' 'NR>1 {gsub("\n", ";", $0); sub(";$", "", $0); print ">"$0}' genes/$1_Genome1_killme.fa | head -n 1 | tr ';' '\n' > genes/$1_Genome1_changeme.fa
+awk -v RS='>' 'NR>1 {gsub("\n", ";", $0); sub(";$", "", $0); print ">"$0}' genes/$1_Genome3_killme.fa | head -n 1 | tr ';' '\n' > genes/$1_Genome3_changeme.fa
+awk -v RS='>' 'NR>1 {gsub("\n", ";", $0); sub(";$", "", $0); print ">"$0}' genes/$1_Genome5_killme.fa | head -n 1 | tr ';' '\n' > genes/$1_Genome5_changeme.fa
+awk -v RS='>' 'NR>1 {gsub("\n", ";", $0); sub(";$", "", $0); print ">"$0}' genes/$1_Genome7_killme.fa | head -n 1 | tr ';' '\n' > genes/$1_Genome7_changeme.fa
+awk -v RS='>' 'NR>1 {gsub("\n", ";", $0); sub(";$", "", $0); print ">"$0}' genes/$1_Genome11_killme.fa | head -n 1 | tr ';' '\n' > genes/$1_Genome11_changeme.fa
+awk -v RS='>' 'NR>1 {gsub("\n", ";", $0); sub(";$", "", $0); print ">"$0}' genes/$1_Genome15_killme.fa | head -n 1 | tr ';' '\n' > genes/$1_Genome15_changeme.fa
+
+sed 's/>.*/>Mm/' genes/$1_changeme.fa > genes/$1.fa
+sed 's/>.*/>Ha/' genes/$1_Genome1_changeme.fa > genes/$1_Genome1.fa
+sed 's/>.*/>Pd/' genes/$1_Genome3_changeme.fa > genes/$1_Genome3.fa
+sed 's/>.*/>Mn/' genes/$1_Genome5_changeme.fa > genes/$1_Genome5.fa
+sed 's/>.*/>Gd/' genes/$1_Genome7_changeme.fa > genes/$1_Genome7.fa
+sed 's/>.*/>Rd/' genes/$1_Genome11_changeme.fa > genes/$1_Genome11.fa
+sed 's/>.*/>Rs/' genes/$1_Genome15_changeme.fa > genes/$1_Genome15.fa
+
+cat genes/$1.fa >> genes/$1_beforeMAFFT.fa
+cat genes/$1_Genome1.fa >> genes/$1_beforeMAFFT.fa
+cat genes/$1_Genome3.fa >> genes/$1_beforeMAFFT.fa
+cat genes/$1_Genome5.fa >> genes/$1_beforeMAFFT.fa
+cat genes/$1_Genome7.fa >> genes/$1_beforeMAFFT.fa
+cat genes/$1_Genome11.fa >> genes/$1_beforeMAFFT.fa
+cat genes/$1_Genome15.fa >> genes/$1_beforeMAFFT.fa
+
+mafft genes/$1_beforeMAFFT.fa > genes/$1_MATTFaligned.fa
+gblocks genes/$1_MATTFaligned.fa -t=c -e=sta
+seqret -sequence genes/$1_MATTFaligned.fasta -osformat2 phylipnon -outseq genes/$1.phy
+mv genes/$1_MATTFaligned.fasta genes/$1_afterGBLOCKS.fa
+
+mv genes/$1_CDS.fa genes/$1/
+mv genes/$1_CDS_Genome1.fa genes/$1/
+mv genes/$1_CDS_Genome3.fa genes/$1/
+mv genes/$1_CDS_Genome5.fa genes/$1/
+mv genes/$1_CDS_Genome7.fa genes/$1/
+mv genes/$1_CDS_Genome11.fa genes/$1/
+mv genes/$1_CDS_Genome15.fa genes/$1/
+
+mv genes/$1_MATTFaligned.fa genes/$1/
+mv genes/$1_MATTFaligned.fasta.htm genes/$1/
+mv genes/$1_afterGBLOCKS.fa genes/$1/
+
+rm genes/$1_deleteme.fa
+rm genes/$1_Genome1_deleteme.fa
+rm genes/$1_Genome3_deleteme.fa
+rm genes/$1_Genome5_deleteme.fa
+rm genes/$1_Genome7_deleteme.fa
+rm genes/$1_Genome11_deleteme.fa
+rm genes/$1_Genome15_deleteme.fa
+
+rm genes/$1_killme.fa
+rm genes/$1_Genome1_killme.fa
+rm genes/$1_Genome3_killme.fa
+rm genes/$1_Genome5_killme.fa
+rm genes/$1_Genome7_killme.fa
+rm genes/$1_Genome11_killme.fa
+rm genes/$1_Genome15_killme.fa
+
+rm genes/$1_changeme.fa
+rm genes/$1_Genome1_changeme.fa
+rm genes/$1_Genome3_changeme.fa
+rm genes/$1_Genome5_changeme.fa
+rm genes/$1_Genome7_changeme.fa
+rm genes/$1_Genome11_changeme.fa
+rm genes/$1_Genome15_changeme.fa
+
+rm genes/$1.fa
+rm genes/$1_Genome1.fa
+rm genes/$1_Genome3.fa
+rm genes/$1_Genome5.fa
+rm genes/$1_Genome7.fa
+rm genes/$1_Genome11.fa
+rm genes/$1_Genome15.fa
+
+mv genes/$1_beforeMAFFT.fa genes/$1.fa
+
+echo "done"
