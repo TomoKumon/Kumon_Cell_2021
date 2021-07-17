@@ -5,8 +5,8 @@ How to obtain protein coding sequences from de novo assemblies
 1. Obtain genome assemblies from NCBI BioProject database with accession number PRJNA669840 and save them under "assembly"
 2. Obtain amino acid sequence (of a single exon) and save it under "query_sequence"
 3. Go to the directory with GetDNfor, "assembly", "query_sequence", "ncbi-blast-2.10.1+", and "genes", and create a path.
-	export PATH="${PATH}:./ncbi-blast-2.10.1+/bin"
-	export PATH="${PATH}:."
+	1. export PATH="${PATH}:./ncbi-blast-2.10.1+/bin"
+	2. export PATH="${PATH}:."
 4. Run GetDNfor. Gene name must be identical to the name of the query sequence.
 	GetDNfor Cenpb
 	If you have multiple genes, create a list of gene (e.g., your_genes.txt). 
