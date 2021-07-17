@@ -1,0 +1,25 @@
+sed "s/DOGCAT/$1/g" changeme.ctl > $1.ctl
+codeml $1.ctl
+echo ">""$1" >> $1_PAMLsummary.txt
+grep "omega" $1_mPAML >> $1_PAMLsummary.txt
+grep "lnL" $1_mPAML | awk '{print $5}' | awk 'NR==3{m3=$1}NR==2{m2=$1}END{print "-2x(M1-M2) = ",-2*(m2-m3)}' >> $1_PAMLsummary.txt
+grep "lnL" $1_mPAML | awk '{print $5}' | awk 'NR==3{m3=$1}NR==2{m2=$1}{n=-2*(m2-m3)} END{if(n <5.99) print "not significant"}' >> $1_PAMLsummary.txt
+grep "lnL" $1_mPAML | awk '{print $5}' | awk 'NR==3{m3=$1}NR==2{m2=$1}{n=-2*(m2-m3)} END{if(n >=5.99) print "significant (p<0.05)"}' >> $1_PAMLsummary.txt
+grep "lnL" $1_mPAML | awk '{print $5}' | awk 'NR==5{m5=$1}NR==4{m4=$1}END{print "-2x(M7-M8) = ",-2*(m4-m5)}' >> $1_PAMLsummary.txt
+grep "lnL" $1_mPAML | awk '{print $5}' | awk 'NR==5{m5=$1}NR==4{m4=$1}{n=-2*(m4-m5)} END{if(n <5.99) print "not significant"}' >> $1_PAMLsummary.txt
+grep "lnL" $1_mPAML | awk '{print $5}' | awk 'NR==5{m5=$1}NR==4{m4=$1}{n=-2*(m4-m5)} END{if(n >=5.99) print "significant (p<0.05)"}' >> $1_PAMLsummary.txt
+echo "" >> $1_PAMLsummary.txt
+
+mkdir $1/
+mv $1.tree $1/
+mv $1.ctl $1/
+mv $1.phy $1/
+mv $1.fa $1/
+mv 2NG.dN $1/
+mv 2NG.dS $1/
+mv 2NG.t $1/
+mv 4fold.nuc $1/
+mv lnf $1/
+mv rst $1/
+mv rst1 $1/
+mv rub $1/
